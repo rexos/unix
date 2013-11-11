@@ -54,6 +54,7 @@ loop do
 
   commands.each_with_index do |c, i|
     command, *arguments = Shellwords.shellsplit( c )
+    puts( *arguments )
 
     if builtin?( command )
       BUILTINS[command].call( *arguments )
