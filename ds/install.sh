@@ -3,10 +3,17 @@ name=""
 URL="https://raw.github.com/rexos/unix/master/ds/ds_source.c"
 sourcename="source.c"
 
+
 if [ -e /usr/bin/curl ]; then
     curl $URL > $sourcename
 else
-    wget $URL > $sourcename
+    which wget
+    if [ $? == 0 ]; then
+	wget $URL > $sourcename
+    else
+	echo "No tools needed to retrieve web content found ... "
+	exit
+    fi
 fi
 
 if [ -f source.c ] &&
