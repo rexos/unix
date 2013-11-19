@@ -22,4 +22,6 @@ if [ -f source.c ] &&
     echo "cleaning ..."
     rm ./$name
     rm ./source.c
+else
+    echo "some requirements are missing ... retry"
 fi
