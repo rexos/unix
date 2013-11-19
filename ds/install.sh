@@ -1,10 +1,12 @@
 #! /bin/bash
 name=""
+URL="https://raw.github.com/rexos/unix/master/ds/ds_source.c"
+sourcename="source.c"
 
 if [ -e /usr/bin/curl ]; then
-    curl https://raw.github.com/rexos/unix/master/ds/ds_source.c > source.c
+    curl $URL > $sourcename
 else
-    wget https://raw.github.com/rexos/unix/master/ds/ds_source.c > source.c
+    wget $URL > $sourcename
 fi
 
 if [ -f source.c ] &&
