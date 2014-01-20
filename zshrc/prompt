@@ -1,5 +1,0 @@
-
-autoload -U colors
-colors
-PS1=" $fg[magenta][$reset_color $fg[white]%n@%m$reset_color $fg[blue]-$reset_color $fg[yellow]%~$reset_color $fg[magenta]]$reset_color $fg[red]%(?..-> [%?] )$reset_color 
-$fg[cyan]↪  $reset_color"

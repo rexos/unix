@@ -1,0 +1,17 @@
+
+autoload -U colors
+colors
+
+function is_repo() {
+    git rev-parse &> /dev/null
+    if [[ $? == 0 ]]; then
+	echo "(±) "
+    else
+	echo ""
+    fi
+}
+
+setopt PROMPT_SUBST
+
+PROMPT=' $fg[magenta][$reset_color $fg[white]%n@%m$reset_color $fg[blue]in$reset_color $fg[yellow]%~$reset_color $fg[white]$(is_repo)$reset_color$fg[magenta]]$reset_color $fg[red]%(?..-> [%?] )$reset_color 
+$fg[cyan]↪  $reset_color'
