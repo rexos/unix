@@ -1,15 +1,16 @@
 #! /Users/alex/.rvm/bin/python
 
 import goslate
-from sys import exit
+from sys import argv
 
 gs = goslate.Goslate()
 text = raw_input(' -> ')
+
 while( text != 'exit' ):
     try:
-        print( ' --> ' + gs.translate(text, 'it') )
+        print( ' --> ' + gs.translate( text, 'it' ) )
     except:
         print('Error translating\n')
         exit(1)
-    text = raw_input(' -> ')
+    text = unicode( raw_input(' -> ') )
 print('Terminated\n')
