@@ -3,11 +3,11 @@ from optparse import OptionParser
 import sys
 import os
 
-class Wordlist:
-    def __init__( self, charset, min, max ):
+class Wordlist( object ):
+    def __init__( self, charset, minlen, maxlen ):
         self.charset = list(set(charset))
-        self.min = min
-        self.max = max
+        self.min = minlen
+        self.max = maxlen
         self.data = []
         self.size = self.__total()
 
@@ -30,12 +30,13 @@ class Wordlist:
     def __total( self ):
         ary = range( self.min, self.max + 1 )
         length = len( self.charset )
-        return sum( map( lambda x: pow(length, x), ary ) )
+        return sum( [ pow(length, x) for x in ary ] )
 
     def __progress( self, current ):
         val = int((current * 100) / float( self.size ))
         sys.stdout.write('\r')
-        sys.stdout.write('Progress: %s%s %d%%' % ('='*(val/5), ' '*(20-(val/5)), val))
+        sys.stdout.write('Progress: %s%s %d%%' %
+                         ('='*(val/5), ' '*(20-(val/5)), val))
         sys.stdout.flush()
 
 
@@ -52,13 +53,21 @@ def main():
         print('\n'+__file__+': charset required')
         exit(-1)
 
-    min = 1 if opts.__dict__['min'] is None else opts.__dict__['min']
-    max = len(args[0]) if opts.__dict__['max'] is None else opts.__dict__['max']
-    filedesc = sys.stdout if opts.__dict__['out'] is None else open(opts.__dict__['out'], 'w')
+    minlen = opts.__dict__['min']
+    if minlen is None:
+        minlen = 1
 
-    wl = Wordlist( args[0], int(min), int(max) )
-    wl.generate()
-    wl.get( filedesc )
+    maxlen = opts.__dict__['max']
+    if maxlen is None:
+        maxlen = len(args[0])
+
+    filedesc = open(opts.__dict__['out'], 'w')
+    if filedesc is None:
+        filedesc = sys.stdout
+
+    wordlist = Wordlist( args[0], int(minlen), int(maxlen) )
+    wordlist.generate()
+    wordlist.get( filedesc )
     filedesc.close()
 
 if __name__ == '__main__':
