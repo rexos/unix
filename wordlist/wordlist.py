@@ -4,16 +4,18 @@ import sys
 import os
 
 class Wordlist( object ):
-    def __init__( self, charset, minlen, maxlen ):
+    def __init__( self, charset, minlen, maxlen, pattern={} ):
         self.charset = list(set(charset))
         self.min = minlen
         self.max = maxlen
+        self.pattern = pattern
         self.size = self.__total()
 
     def generate( self, filedesc ):
         counter = 0
         for cur in range(self.min, self.max + 1):
             for word in product( self.charset, repeat=cur ):
+                #to implement pattern build
                 print >> filedesc , ''.join(list(word))
                 if filedesc != sys.stdout:
                     counter = counter + 1
@@ -36,6 +38,19 @@ class Wordlist( object ):
                          ('='*(val/5), ' '*(20-(val/5)), val))
         sys.stdout.flush()
 
+class Pattern(object):
+    def __init__( self, raw ):
+        if raw is None:
+            raw = ''
+        self.string = raw
+
+    def scan( self ):
+        res = {}
+        for ind, val in enumerate(self.string):
+            if val != '#':
+                res[ind] = val
+        return res
+
 
 def main():
     parser = OptionParser()
@@ -43,9 +58,10 @@ def main():
     parser.add_option('-M', '--max', help='Maximum word size')
     parser.add_option('-o', '--out',
                       help='Saves output to specified file')
+    parser.add_option('-p', help='Pattern to follow')
 
     opts, args = parser.parse_args()
-
+    
     if not len(args):
         print('\n'+__file__+': charset required')
         exit(-1)
@@ -64,7 +80,10 @@ def main():
     else:
         filedesc = open(opts.__dict__['out'], 'w')
 
-    wordlist = Wordlist( args[0], int(minlen), int(maxlen) )
+    pattern = Pattern( opts.__dict__['p'] )
+
+    wordlist = Wordlist( args[0], int(minlen),
+                         int(maxlen), pattern.scan() )
     wordlist.generate( filedesc )
     filedesc.close()
 
