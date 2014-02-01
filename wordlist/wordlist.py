@@ -8,20 +8,17 @@ class Wordlist( object ):
         self.charset = list(set(charset))
         self.min = minlen
         self.max = maxlen
-        self.data = []
         self.size = self.__total()
 
-    def generate( self ):
+    def generate( self, filedesc ):
         counter = 0
         for cur in range(self.min, self.max + 1):
             for word in product( self.charset, repeat=cur ):
-                self.data.extend( [''.join(list(word))] )
-                counter = counter + 1
-                self.__progress( counter )
-
-    def get( self, filedesc ):
-        for word in self.data:
-            print >> filedesc , word
+                print >> filedesc , ''.join(list(word))
+                if filedesc != sys.stdout:
+                    counter = counter + 1
+                    self.__progress( counter )
+                
         if filedesc != sys.stdout:
             filedesc.seek(0, os.SEEK_END)
             print( '\n' + __file__ + ' List size: ' +
@@ -61,13 +58,14 @@ def main():
     if maxlen is None:
         maxlen = len(args[0])
 
-    filedesc = open(opts.__dict__['out'], 'w')
-    if filedesc is None:
+
+    if opts.__dict__['out'] is None:
         filedesc = sys.stdout
+    else:
+        filedesc = open(opts.__dict__['out'], 'w')
 
     wordlist = Wordlist( args[0], int(minlen), int(maxlen) )
-    wordlist.generate()
-    wordlist.get( filedesc )
+    wordlist.generate( filedesc )
     filedesc.close()
 
 if __name__ == '__main__':
