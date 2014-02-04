@@ -1,5 +1,6 @@
 from itertools import product
 from optparse import OptionParser
+from collections import OrderedDict
 import sys
 import os
 
@@ -16,6 +17,7 @@ class Wordlist( object ):
         for cur in range(self.min, self.max + 1):
             for word in product( self.charset, repeat=cur ):
                 #to implement pattern build
+                #end
                 print >> filedesc , ''.join(list(word))
                 if filedesc != sys.stdout:
                     counter = counter + 1
@@ -45,9 +47,9 @@ class Pattern(object):
         self.string = raw
 
     def scan( self ):
-        res = {}
+        res = OrderedDict()
         for ind, val in enumerate(self.string):
-            if val != '#':
+            if val != '@':
                 res[ind] = val
         return res
 
