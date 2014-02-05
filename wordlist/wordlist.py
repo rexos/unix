@@ -11,7 +11,7 @@ class Wordlist( object ):
         self.max = maxlen
         self.pattern = pattern
         self.perms = {}
-        self.filedesc = open(filedesc, 'w')
+        self.filedesc = filedesc
         self.size = self.__total()
 
     def generate( self ):
@@ -22,10 +22,10 @@ class Wordlist( object ):
                 if self.filedesc != sys.stdout:
                     counter = counter + 1
                     self.__progress( counter )
-        if filedesc != sys.stdout:
-            filedesc.seek(0, os.SEEK_END)
+        if self.filedesc != sys.stdout:
+            self.filedesc.seek(0, os.SEEK_END)
             print( '\n' + __file__ + ' List size: ' +
-                   str(filedesc.tell()) + ' bytes' )
+                   str(self.filedesc.tell()) + ' bytes' )
         self.filedesc.close()
 
     def generate_with_pattern( self, data={}, composed='', prev=0 ):
@@ -104,9 +104,9 @@ def main():
 
 
     if opts.__dict__['out'] is None:
-        filedesc = 1
+        filedesc = sys.stdout
     else:
-        filedesc = opts.__dict__['out']
+        filedesc = open(opts.__dict__['out'], 'w')
 
     pattern = opts.__dict__['p']
     wordlist = Wordlist( args[0], int(minlen),
@@ -115,6 +115,7 @@ def main():
         wordlist.generate_with_pattern()
     else:
         wordlist.generate()
+        wordlist.filedesc.close()
 
 if __name__ == '__main__':
     main()
