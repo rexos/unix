@@ -3,7 +3,7 @@ from wordlist import Pattern
 from collections import OrderedDict
 
 charset = 'abc'
-pattern = '@@R@@@Q@F@@'
+pattern = '@@R@@@Q@F@@A'
 prev = 0
 perms = {}
 pat = Pattern(pattern)
@@ -16,8 +16,11 @@ for ind, val in enumerate(list(pattern)):
 
 def solve(data, composed='', prev=0):
     if data == {}:
-        for word in perms[len(pattern) - prev]:
-            print(composed+(''.join(list(word))))
+        if perms.get(len(pattern)-prev, None):
+            for word in perms[len(pattern) - prev]:
+                print(composed+(''.join(list(word))))
+        else:
+            print( composed )
     else:
         num, val = data.popitem(last=False)
         for word in perms[num-prev]:

@@ -5,28 +5,52 @@ import sys
 import os
 
 class Wordlist( object ):
-    def __init__( self, charset, minlen, maxlen, pattern={} ):
+    def __init__( self, charset, minlen, maxlen, pattern ):
         self.charset = list(set(charset))
         self.min = minlen
         self.max = maxlen
         self.pattern = pattern
+        self.perms = {}
         self.size = self.__total()
 
     def generate( self, filedesc ):
         counter = 0
         for cur in range(self.min, self.max + 1):
             for word in product( self.charset, repeat=cur ):
-                #to implement pattern build
-                #end
                 print >> filedesc , ''.join(list(word))
                 if filedesc != sys.stdout:
                     counter = counter + 1
                     self.__progress( counter )
-                
+
         if filedesc != sys.stdout:
             filedesc.seek(0, os.SEEK_END)
             print( '\n' + __file__ + ' List size: ' +
                    str(filedesc.tell()) + ' bytes' )
+
+    def generate_with_pattern( self, data={}, composed='', prev=0 ):
+        if not prev:
+            self.__create_perms()
+            data = Pattern( self.pattern )
+            data = data.scan()
+        if data == {}:
+            if self.perms.get(len(self.pattern)-prev, None):
+                for word in self.perms[len(self.pattern) - prev]:
+                    print(composed+(''.join(list(word))))
+            else:
+                print( composed )
+        else:
+            num, val = data.popitem(last=False)
+            for word in self.perms[num-prev]:
+                self.generate_with_pattern( OrderedDict(data), composed +
+                                            (''.join(list(word))) + val, num+1 )
+
+    def __create_perms( self ):
+        prev = 0
+        for ind, val in enumerate(list(self.pattern)):
+            if val != '@' and not self.perms.get((ind-prev), None):
+                self.perms[ind-prev] = list(product(self.charset,
+                                                    repeat=(ind-prev)))
+                prev = ind + 1
 
     def __total( self ):
         ary = range( self.min, self.max + 1 )
@@ -63,7 +87,7 @@ def main():
     parser.add_option('-p', help='Pattern to follow')
 
     opts, args = parser.parse_args()
-    
+
     if not len(args):
         print('\n'+__file__+': charset required')
         exit(-1)
@@ -82,11 +106,11 @@ def main():
     else:
         filedesc = open(opts.__dict__['out'], 'w')
 
-    pattern = Pattern( opts.__dict__['p'] )
+    pattern = opts.__dict__['p']
 
     wordlist = Wordlist( args[0], int(minlen),
-                         int(maxlen), pattern.scan() )
-    wordlist.generate( filedesc )
+                         int(maxlen), pattern )
+    wordlist.generate_with_pattern()
     filedesc.close()
 
 if __name__ == '__main__':
