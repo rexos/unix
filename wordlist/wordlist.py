@@ -5,27 +5,28 @@ import sys
 import os
 
 class Wordlist( object ):
-    def __init__( self, charset, minlen, maxlen, pattern ):
+    def __init__( self, charset, minlen, maxlen, pattern, filedesc ):
         self.charset = list(set(charset))
         self.min = minlen
         self.max = maxlen
         self.pattern = pattern
         self.perms = {}
+        self.filedesc = open(filedesc, 'w')
         self.size = self.__total()
 
-    def generate( self, filedesc ):
+    def generate( self ):
         counter = 0
         for cur in range(self.min, self.max + 1):
             for word in product( self.charset, repeat=cur ):
-                print >> filedesc , ''.join(list(word))
-                if filedesc != sys.stdout:
+                print >> self.filedesc , ''.join(list(word))
+                if self.filedesc != sys.stdout:
                     counter = counter + 1
                     self.__progress( counter )
-
         if filedesc != sys.stdout:
             filedesc.seek(0, os.SEEK_END)
             print( '\n' + __file__ + ' List size: ' +
                    str(filedesc.tell()) + ' bytes' )
+        self.filedesc.close()
 
     def generate_with_pattern( self, data={}, composed='', prev=0 ):
         if not prev:
@@ -35,9 +36,9 @@ class Wordlist( object ):
         if data == {}:
             if self.perms.get(len(self.pattern)-prev, None):
                 for word in self.perms[len(self.pattern) - prev]:
-                    print(composed+(''.join(list(word))))
+                    print >> self.filedesc, composed+(''.join(list(word)))
             else:
-                print( composed )
+                print >> self.filedesc, composed
         else:
             num, val = data.popitem(last=False)
             for word in self.perms[num-prev]:
@@ -92,6 +93,7 @@ def main():
         print('\n'+__file__+': charset required')
         exit(-1)
 
+
     minlen = opts.__dict__['min']
     if minlen is None:
         minlen = 1
@@ -102,16 +104,17 @@ def main():
 
 
     if opts.__dict__['out'] is None:
-        filedesc = sys.stdout
+        filedesc = 1
     else:
-        filedesc = open(opts.__dict__['out'], 'w')
+        filedesc = opts.__dict__['out']
 
     pattern = opts.__dict__['p']
-
     wordlist = Wordlist( args[0], int(minlen),
-                         int(maxlen), pattern )
-    wordlist.generate_with_pattern()
-    filedesc.close()
+                         int(maxlen), pattern, filedesc )
+    if pattern:
+        wordlist.generate_with_pattern()
+    else:
+        wordlist.generate()
 
 if __name__ == '__main__':
     main()
