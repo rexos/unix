@@ -94,7 +94,7 @@ def main():
         exit(-1)
 
 
-    minlen = opts.__dict__['min']
+    minlen = opts.__dict__['min'] 
     if minlen is None:
         minlen = 1
 
