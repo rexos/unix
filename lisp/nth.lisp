@@ -14,5 +14,3 @@
 		      ((null L) nil)
 		      ((= (list-length L) 1) (first L))
 		      (t (last-cond (rest L)))))
-
-(princ (last-cond '(4 3 f a 4 6 1 6 7 8 12)))
