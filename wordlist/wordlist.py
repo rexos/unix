@@ -5,6 +5,7 @@ import sys
 import os
 
 class Wordlist( object ):
+
     def __init__( self, charset, minlen, maxlen, pattern, filedesc ):
         self.charset = list(set(charset))
         self.min = minlen
@@ -48,9 +49,10 @@ class Wordlist( object ):
     def __create_perms( self ):
         prev = 0
         for ind, val in enumerate(list(self.pattern)):
-            if val != '@' and not self.perms.get((ind-prev), None):
-                self.perms[ind-prev] = list(product(self.charset,
-                                                    repeat=(ind-prev)))
+            if val != '@': 
+                if not self.perms.get((ind-prev), None):
+                    self.perms[ind-prev] = list(product(self.charset,
+                                                        repeat=(ind-prev)))
                 prev = ind + 1
 
     def __total( self ):
