@@ -1,0 +1,28 @@
+Postfix is quite easy to configure, especially for relaying through a "smarthost" (Gmail or ISP or whatever).
+
+Configuring Postfix for Gmail:
+
+Update /etc/postfix/main.cf:
+
+relayhost = [smtp.gmail.com]:587
+smtp_tls_security_level = encrypt
+smtp_tls_CApath = /etc/ssl/certs
+smtp_sasl_auth_enable = yes
+smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+smtp_sasl_security_options = noanonymous
+Create /etc/postfix/sasl_passwd:
+
+[smtp.gmail.com]:587     joe@gmail.com:JoesSekritPassword
+Run as root:
+
+postmap /etc/postfix/sasl_passwd
+chmod 640 /etc/postfix/sasl_passwd*
+chgrp postfix /etc/postfix/sasl_passwd*
+Tell Postfix to reload configuration:
+
+postfix reload
+Exim is not bad either, as long as you ignore all the Debian-specific tutorials and their macros nonsense.
+
+There also are msmtp and esmtp, which can only use a smarthost and so don't need to be run as a daemon. They also are much easier to configure, especially for multi-user environments.
+
+If you are looking for the mail command, make sure you get either heirloom-mailx or GNU mailutils. (The classic bsd-mailx works, but it lacks many features such as Maildir or MIME support.) I still prefer mutt, though.
